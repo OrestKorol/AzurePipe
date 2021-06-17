@@ -1,0 +1,39 @@
+# Node.js
+# Build a general Node.js project with npm.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger:
+- master
+
+pool: default
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '10.x'
+  displayName: 'Install Node.js'
+
+- task: Npm@1
+  displayName: 'Install'
+  inputs:
+    command: 'install'
+    verbose: true
+
+- task: Npm@1
+  displayName: 'Tests'
+  inputs:
+    command: 'custom'
+    customCommand: 'run test'
+
+- task: Npm@1
+  displayName: 'E2E Tests'
+  inputs:
+    command: 'custom'
+    customCommand: 'run test:e2e'
+
+- task: CopyFilesOverSSH@0
+  inputs:
+    sshEndpoint: 'AppPipeline'
+    contents: '**'
+    readyTimeout: '20000'
